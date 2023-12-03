@@ -6,6 +6,8 @@ import { onCloseAppLoader, onOpenAppLoader } from "../../store";
 import { useAppDispatch } from "../../utils/redux";
 import { Modal } from "./Modal";
 import { VShieldSecurityIcon } from "../icons";
+import { useMutationRequest } from "api/useMutationRequest";
+import { LoginDtoOut, OTPDtoIn } from "generated";
 
 interface IProps {
   email?: string;
@@ -24,14 +26,28 @@ export const OTPModal = ({
 
   const dispatch = useAppDispatch();
 
-  const onProceedClick = () => {
-    onClose();
-    dispatch(onOpenAppLoader());
-    setTimeout(() => {
-      dispatch(onCloseAppLoader());
+  const { isLoading, trigger } = useMutationRequest<OTPDtoIn, LoginDtoOut>({
+    service: "/api/Otp",
+    method: "post",
+    tag: "OtpService",
+    onSuccess: (val, vars) => {
+      setOtp("");
+      onClose();
       successCallback?.();
-    }, 2000);
-  };
+    },
+  });
+
+  const { isLoading: isResending, trigger: resendOtp } = useMutationRequest<
+    OTPDtoIn,
+    LoginDtoOut
+  >({
+    service: "/api/Otp/resend",
+    method: "post",
+    tag: "OtpService",
+    onSuccess: (val, vars) => {
+      setOtp("");
+    },
+  });
 
   return (
     <Modal
@@ -45,7 +61,13 @@ export const OTPModal = ({
           <Button
             disabled={otp.length !== 6}
             className="rounded-[0px]"
-            onClick={onProceedClick}
+            isLoading={isLoading}
+            onClick={() =>
+              trigger({
+                otp,
+                email,
+              })
+            }
           >
             CONFIRM & PROCEED
           </Button>
@@ -81,7 +103,17 @@ export const OTPModal = ({
           inputType="password"
           placeholder="-"
         />
-        <PaleButton className="mt-5">RESEND OTP</PaleButton>
+        <PaleButton
+          className="mt-5"
+          onClick={() =>
+            resendOtp({
+              email,
+              otp,
+            })
+          }
+        >
+          {isResending ? "Loading" : "RESEND OTP"}
+        </PaleButton>
       </div>
     </Modal>
   );

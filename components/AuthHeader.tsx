@@ -20,7 +20,7 @@ const AuthHeader = ({ currentUser }) => {
 
   useEffect(() => {
     const listener = () => {
-      if (window.scrollY > 70) {
+      if (window.scrollY > 100) {
         setAnimateHeader(true);
       } else setAnimateHeader(false);
     };

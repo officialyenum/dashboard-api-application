@@ -1,3 +1,4 @@
+import { Spinner } from "components/loaders";
 import { forwardRef } from "react";
 import { twMerge } from "tailwind-merge";
 
@@ -18,6 +19,7 @@ export const Button = (props: ButtonProps) => {
     children,
     className,
     disabled,
+    isLoading,
     rounded,
     ...rest
   } = props;
@@ -30,9 +32,10 @@ export const Button = (props: ButtonProps) => {
         rounded && "rounded",
         className
       )}
+      type={type}
       {...rest}
     >
-      {children}
+      {isLoading ? <Spinner /> : children}
     </button>
   );
 };
@@ -68,14 +71,22 @@ export const PaleButton = (props: ButtonProps) => {
 };
 
 export const DangerButton = (props: ButtonProps) => {
-  const { type = "button", children, ...rest } = props;
+  const {
+    type = "button",
+    children,
+    disabled,
+    className,
+    rounded,
+    ...rest
+  } = props;
   return (
     <button
-      className={`bg-red-500 shadow hover:bg-blue-700 w-full py-3 flex items-center justify-center rounded ${
-        props.disabled
-          ? "bg-blue_fade hover:bg-blue_fade cursor-not-allowed"
-          : ""
-      } ${props.className}`}
+      className={twMerge(
+        "bg-red-500 shadow hover:bg-red-700 w-full py-3 flex items-center justify-center rounded",
+        disabled && "bg-blue_fade hover:bg-blue_fade cursor-not-allowed",
+        rounded && "rounded",
+        className
+      )}
       {...rest}
     >
       <p

@@ -22,22 +22,53 @@ import ConfirmationModal from "../../components/modals/ConfirmationModal";
 import { useAppDispatch } from "../../utils/redux";
 import { onCloseAppLoader, onOpenAppLoader } from "../../store";
 import { EmptyState } from "../../components/emptyState";
+import { useGetRequest } from "api/useGetRequest";
+import { ClientUserDtoIn } from "generated";
+import { useMutationRequest } from "api/useMutationRequest";
+import AddNewUserModal from "components/modals/AddNewUserModal";
 
 const UserManagement = () => {
   const dispatch = useAppDispatch();
   const imageSources = [];
 
+  const newUserModalHandler = useDisclosure();
   const userDeletedModalHandler = useDisclosure();
   const userInvitationResentModalHandler = useDisclosure();
   const userDeleteConfirmationModalHandler = useDisclosure();
 
-  const handleDeleteUser = () => {
-    dispatch(onOpenAppLoader());
-    setTimeout(() => {
+  const { isLoading, data } = useGetRequest<undefined, ClientUserDtoIn[]>({
+    service: "/api/UserManagement",
+    tag: "UserManagementService",
+  });
+
+  const { isLoading: isDeleting, trigger: triggerDelete } = useMutationRequest<
+    undefined,
+    ClientUserDtoIn
+  >({
+    service: "/api/UserManagement",
+    tag: "UserManagementService",
+    method: "delete",
+    onSuccess: (val) => {
       dispatch(onCloseAppLoader());
       userDeleteConfirmationModalHandler.onClose();
       userDeletedModalHandler.onOpen();
-    }, 3000);
+    },
+  });
+
+  React.useEffect(() => {
+    if (isDeleting) {
+      dispatch(onOpenAppLoader());
+    } else {
+      dispatch(onCloseAppLoader());
+    }
+
+    () => dispatch(onCloseAppLoader());
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isDeleting]);
+
+  const handleDeleteUser = () => {
+    triggerDelete(undefined);
+    userDeleteConfirmationModalHandler.onClose();
   };
 
   return (
@@ -53,7 +84,7 @@ const UserManagement = () => {
       <SectionHeader
         title="Users"
         btnText="Add New User"
-        onButtonPress={() => console.log("opening")}
+        onButtonPress={() => newUserModalHandler.onOpen()}
         rightContent={
           <div className="w-[100px] h-10 bg-white rounded-md flex items-center justify-center">
             <select
@@ -302,6 +333,10 @@ const UserManagement = () => {
           </Tab>
         </Tabs>
       </div>
+      <AddNewUserModal
+        isOpen={newUserModalHandler.isOpen}
+        onClose={newUserModalHandler.onClose}
+      />
       <ActionSuccessfulModal
         isOpen={userDeletedModalHandler.isOpen}
         onClose={userDeletedModalHandler.onClose}

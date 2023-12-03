@@ -22,3 +22,5 @@ export const getRandomColor = (): string => {
 
   return color;
 };
+
+export * from "./notify";

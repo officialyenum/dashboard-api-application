@@ -15,6 +15,9 @@ import StatusPill from "../../components/Pills/StatusPill";
 import AddANewCardModal from "../../components/modals/AddANewCardModal";
 import { onCloseAppLoader, onOpenAppLoader } from "../../store";
 import { useAppDispatch } from "../../utils/redux";
+import { useGetRequest } from "api/useGetRequest";
+import { SubscriptionDtoOutListSuccessResponseDtoOut } from "generated";
+import { EmptyState } from "components/emptyState";
 
 const SubscriptionPage = () => {
   const dispatch = useAppDispatch();
@@ -27,6 +30,23 @@ const SubscriptionPage = () => {
   const paymentMethodAddedModalHandler = useDisclosure();
   const deleteCardConfirmationModalHandler = useDisclosure();
 
+  const { data: subscriptions, isLoading } = useGetRequest<
+    {
+      pageIndex?: number;
+      lastId?: number;
+    },
+    SubscriptionDtoOutListSuccessResponseDtoOut
+  >({
+    service: "/api/Subscription",
+    tag: "SubscriptionService",
+    // payload: {
+    //   lastId: 1,
+    //   pageIndex: 1,
+    // },
+  });
+
+  console.log(subscriptions);
+
   const handleDeleteCard = () => {
     deleteCardConfirmationModalHandler.onClose();
     dispatch(onOpenAppLoader());
@@ -35,7 +55,6 @@ const SubscriptionPage = () => {
       paymentDeletedModalHandler.onOpen();
     }, 3000);
   };
-
   return (
     <div>
       {/* breadcrumbs */}
@@ -51,53 +70,69 @@ const SubscriptionPage = () => {
             </p>
           </div>
           <Tabs>
-            <Tab label="All Subscriptions (1)">
-              <Table
-                tableHeader={
-                  <TableRow>
-                    <TableHead>SUBSCRIPTION ID</TableHead>
-                    <TableHead>USERS</TableHead>
-                    <TableHead>AMOUNT</TableHead>
-                    <TableHead>DATE</TableHead>
-                    <TableHead>STATUS</TableHead>
-                  </TableRow>
-                }
-                tableBody={[1, 2, 3, 4, 5].map((item, index) => (
-                  <TableRow key={index}>
-                    <TableData>099199313</TableData>
-                    <TableData>1-10</TableData>
-                    <TableData>1,350</TableData>
-                    <TableData>22/2/2022 3:45:01 PM</TableData>
-                    <TableData>
-                      <StatusPill status="active" />
-                    </TableData>
-                  </TableRow>
-                ))}
-              />
+            <Tab
+              label={`All Subscriptions (${subscriptions?.data?.length ?? 0})`}
+            >
+              {subscriptions?.data?.length > 0 ? (
+                <Table
+                  tableHeader={
+                    <TableRow>
+                      <TableHead>SUBSCRIPTION ID</TableHead>
+                      <TableHead>USERS</TableHead>
+                      <TableHead>AMOUNT</TableHead>
+                      <TableHead>DATE</TableHead>
+                      <TableHead>STATUS</TableHead>
+                    </TableRow>
+                  }
+                  tableBody={subscriptions?.data?.map((item, index) => (
+                    <TableRow key={index}>
+                      <TableData>{item?.id ?? "--/--"}</TableData>
+                      <TableData>{item?.totalUsers ?? "--/--"}</TableData>
+                      <TableData>{item?.price ?? "--/--"}</TableData>
+                      <TableData>{item?.createDate ?? "--/--"}</TableData>
+                      <TableData>
+                        <StatusPill status={item?.status} />
+                      </TableData>
+                    </TableRow>
+                  ))}
+                />
+              ) : (
+                <EmptyState
+                  title="No Subscriptions at the moment"
+                  info="We are unable to retrieve any subscriptions at this time, Try refreshing or try again later."
+                />
+              )}
             </Tab>
-            <Tab label="Active (1)">
-              <Table
-                tableHeader={
-                  <TableRow>
-                    <TableHead>SUBSCRIPTION ID</TableHead>
-                    <TableHead>USERS</TableHead>
-                    <TableHead>AMOUNT</TableHead>
-                    <TableHead>DATE</TableHead>
-                    <TableHead>STATUS</TableHead>
-                  </TableRow>
-                }
-                tableBody={[1, 2, 3, 4, 5].map((item, index) => (
-                  <TableRow key={index}>
-                    <TableData>099199313</TableData>
-                    <TableData>1-10</TableData>
-                    <TableData>1,350</TableData>
-                    <TableData>22/2/2022 3:45:01 PM</TableData>
-                    <TableData>
-                      <StatusPill status="active" />
-                    </TableData>
-                  </TableRow>
-                ))}
-              />
+            <Tab label={`Active (${subscriptions?.data?.length ?? 0})`}>
+              {subscriptions?.data?.length > 0 ? (
+                <Table
+                  tableHeader={
+                    <TableRow>
+                      <TableHead>SUBSCRIPTION ID</TableHead>
+                      <TableHead>USERS</TableHead>
+                      <TableHead>AMOUNT</TableHead>
+                      <TableHead>DATE</TableHead>
+                      <TableHead>STATUS</TableHead>
+                    </TableRow>
+                  }
+                  tableBody={subscriptions?.data?.map((item, index) => (
+                    <TableRow key={index}>
+                      <TableData>{item?.id ?? "--/--"}</TableData>
+                      <TableData>{item?.totalUsers ?? "--/--"}</TableData>
+                      <TableData>{item?.price ?? "--/--"}</TableData>
+                      <TableData>{item?.createDate ?? "--/--"}</TableData>
+                      <TableData>
+                        <StatusPill status={item?.status} />
+                      </TableData>
+                    </TableRow>
+                  ))}
+                />
+              ) : (
+                <EmptyState
+                  title="No Active Subscriptions at the moment"
+                  info="We are unable to retrieve any active subscriptions at this time, Try refreshing or try again later."
+                />
+              )}
             </Tab>
             <Tab label="Expired (4)">
               <Table

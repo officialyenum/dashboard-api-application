@@ -28,8 +28,8 @@ const Sidebar = ({ children }) => {
       href: "/user-management",
       icon: <RxDashboard />,
       type: "link",
-      canShow:
-        user?.accountEnabled && user?.subscriptionStatus !== "UNSUBSCRIBED",
+      canShow: true,
+      // user?.accountEnabled && user?.subscriptionStatus !== "UNSUBSCRIBED",
       isActive: pathname === "/user-management",
     },
     {
@@ -39,15 +39,15 @@ const Sidebar = ({ children }) => {
       type: "link",
       canShow:
         user?.accountEnabled && user?.subscriptionStatus !== "UNSUBSCRIBED",
-      isActive: pathname === "/paymnent-history",
+      isActive: pathname === "/payment-history",
     },
     {
       name: "Invoices",
       href: "/invoice-management",
       icon: <RxDashboard />,
       type: "link",
-      canShow:
-        user?.accountEnabled && user?.subscriptionStatus !== "UNSUBSCRIBED",
+      canShow: true,
+      // user?.accountEnabled && user?.subscriptionStatus !== "UNSUBSCRIBED",
       isActive: pathname === "/invoice-management",
     },
     {
@@ -55,8 +55,8 @@ const Sidebar = ({ children }) => {
       href: "/api-management",
       icon: <RxDashboard />,
       type: "link",
-      canShow:
-        user?.accountEnabled && user?.subscriptionStatus !== "UNSUBSCRIBED",
+      canShow: true,
+      // user?.accountEnabled && user?.subscriptionStatus !== "UNSUBSCRIBED",
       isActive: pathname === "/api-management",
     },
     {
@@ -68,7 +68,8 @@ const Sidebar = ({ children }) => {
       href: "/subscription",
       icon: <RxDashboard />,
       type: "link",
-      canShow: user?.accountEnabled,
+      canShow: true,
+      // user?.accountEnabled,
       isActive: pathname === "/subscription",
     },
     {
@@ -76,8 +77,8 @@ const Sidebar = ({ children }) => {
       href: "/settings",
       icon: <RxDashboard />,
       type: "link",
-      canShow:
-        user?.accountEnabled && user?.subscriptionStatus !== "UNSUBSCRIBED",
+      canShow: true,
+      // user?.accountEnabled && user?.subscriptionStatus !== "UNSUBSCRIBED",
       isActive: pathname === "/settings",
     },
   ];
